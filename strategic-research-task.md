@@ -1,0 +1,355 @@
+# [战略研究] 2025.12—2026.03 技术生态全景与 2026 趋势研判
+
+## 0. 执行摘要
+
+**结论一句话**：不同项目的底层设计思路之所以高度趋同，不是“创意变少了”，而是行业已经被同一组物理约束、工程约束和企业约束压缩到了少数可行解。
+
+2025 年 12 月到 2026 年 3 月这段窗口里，技术生态的核心变化不是又出现了多少“新 Agent”，而是几乎所有头部平台都在朝同一套骨架收敛：
+
+`模型能力` + `工具调用` + `持久化状态` + `跨系统协议` + `可观测/可评测` + `企业治理控制面`
+
+这意味着 2026 年真正有战略价值的，不再是“有没有 Agent”，而是：
+
+1. 能否把 Agent 从一次性对话产品，变成可恢复、可审计、可治理的运行时系统。
+2. 能否把上下文、工具、UI、支付、其他 Agent 纳入统一协议层。
+3. 能否把企业信任机制前置为一等公民，而不是事后补丁。
+
+## 1. 研究范围与方法
+
+### 时间窗
+
+- 观察窗口：2025-12-01 至 2026-03-15
+- 关键背景信号：必要时引用 2025 年更早的官方发布，用于解释 2026 年收敛结果
+
+### 资料原则
+
+- 只采用官方博客、官方文档、官方帮助中心、官方协议站点为主
+- 优先看“平台能力发布”和“运行时/协议/治理能力”而非营销案例
+- 由于 issue 中提到的 `strategic-research-task.md` 初始并不存在于仓库，本交付以 issue 描述中的核心问题作为直接验收标准
+- 对 2026 判断明确区分：
+  - `事实`：已有官方发布支撑
+  - `推断`：基于多个平台共振后的判断
+
+## 2. 2025.12—2026.03 的关键信号
+
+### 2.1 OpenAI：从模型 API 转向 Agent 平台栈
+
+- 2025-10-06，OpenAI 发布 AgentKit，把工作流编排、连接器管理、嵌入式 Agent UI、评测与优化打包为更完整的平台层。
+- 2026-02-10，OpenAI 对 deep research 更新，支持连接任意 MCP 或 app，并支持限制可信站点搜索；这说明“研究 Agent”开始被协议化和可控化，而不是单纯更强浏览器。
+- OpenAI 帮助中心明确写到：自 2025-03-11 起，Responses API、Web Search、File Search、Computer Use、Agents SDK with Tracing 是其新 Agents 平台的基础积木。
+
+**信号含义**：OpenAI 的重心已经不是“提供一个更聪明的模型端点”，而是“提供一套带 tracing、tools、UI、连接器、评测的 Agent 操作系统”。
+
+### 2.2 Anthropic：把长时任务、代码工作流和开放协议做深
+
+- 2026-02-05，Anthropic 发布 Claude Opus 4.6，强调更长时的 agentic task、更可靠的大代码库操作、Terminal-Bench 2.0 领先，以及 1M token context window beta。
+- 2025 年以来，Anthropic 持续把 Claude Code 与 MCP 绑定在一起，MCP 已从开发者活动话题演变成跨客户端能力层。
+- 2026-01-26，MCP 官方发布 MCP Apps 作为首个正式扩展，允许工具直接返回可交互 UI；支持方已包含 ChatGPT、Claude、Goose、VS Code。
+
+**信号含义**：Anthropic 所在阵营推动的不是“另一个框架”，而是“标准化上下文与工具，再把 UI 也纳入协议”的路线。
+
+### 2.3 Google Cloud：把多 Agent 协同与企业运行时产品化
+
+- 2025-09-18，Vertex AI Agent Builder 明确把 Agent Engine、Sessions、Memory Bank、evaluation、observability 打成生产栈。
+- 2025-11 至 2026-01，Google 持续把 ADK、A2A、Agent Engine 作为 Agent Builder stack 对外表述。
+- 2025-12 的官方月报提到 UCP 与 A2A、AP2、MCP 的兼容性，说明 Google 正在按“协议拼装”而非“单体闭环”推进生态。
+- 2026-01 左右，Google Cloud 继续推进增强工具治理与 GA 级 memory/session 能力。
+
+**信号含义**：Google 的产品方向非常清晰，核心不是“更强单代理”，而是“企业级多代理系统 + 协议层 + 托管运行时 + 治理能力”。
+
+### 2.4 Microsoft：把 Agent 纳入企业控制面，而不是附属插件
+
+- 2026-03-09，Microsoft 宣布 Microsoft 365 E7 与 Agent 365，把 Copilot、agent、身份、数据保护、安全与可观测性绑定为一个套件。
+- 同日的安全博客强调，企业落地 agentic AI 的关键问题已经变成：如何跟踪 Agent、如何知道它们在做什么、如何统一治理。
+
+**信号含义**：Microsoft 的最新表述非常值得重视。它没有把“Agent”定义成单点功能，而是定义成一个需要独立控制平面的组织级资产。
+
+### 2.5 AWS 与中间层生态：运行时、观测、评测成为必备而非加分项
+
+- 2026-03-11，AWS 官方博客直接以“Operationalizing Agentic AI”为主题面向 C-suite 讲如何把 Agent 推进到生产。
+- 2026-02-18，AWS 官方文章围绕 Amazon Bedrock AgentCore 讲跨 ERP/外部数据源的采购工作流自动化。
+- LangChain 在 2025-10 宣布把自己定位为 `agent engineering platform`；LangGraph 1.0 的核心卖点是 durable execution、memory、human-in-the-loop、deployment、observability。
+- CrewAI 文档把 tracing/observability 作为内建能力展示，而不是附录功能。
+
+**信号含义**：中间层竞争已经从“谁更会写 prompt”切到“谁能提供可靠 runtime、trace、eval、deployment”。
+
+## 3. 为什么不同项目的底层设计思路高度趋同？
+
+### 3.1 约束一：Agent 已经不是聊天，而是长事务系统
+
+只要任务从“回答一个问题”升级到“连续调用工具、跨多步做事、可能中断、需要人接管”，系统就会自然逼近工作流引擎或分布式任务系统的形态。
+
+因此各家都开始强调：
+
+- durable execution
+- checkpoint / resume
+- session / thread / memory
+- human-in-the-loop
+- trace / replay
+
+这不是风格偏好，而是长时任务的工程必需品。
+
+### 3.2 约束二：工具世界异构，必须先有协议层
+
+模型要接外部世界，必须面对：
+
+- 不同 SaaS / API / 数据库 / 文件系统
+- 不同身份认证与权限边界
+- 不同 UI 交互形式
+- 不同 Agent 之间的协作
+
+于是协议层开始收敛：
+
+- MCP 负责工具与上下文暴露
+- A2A 负责 Agent 与 Agent 的协商和通信
+- MCP Apps / Apps SDK 把 UI 也纳入对话协议
+- AP2 试图把支付/交易动作标准化
+
+当协议层出现后，应用层的架构相似度会大幅上升。
+
+### 3.3 约束三：企业采购的核心不再是“能不能做”，而是“能不能管”
+
+2026 年初最明显的变化，是头部厂商都在讲治理、审计、身份、可观测性，而不是单纯 demo。
+
+企业真正关心的是：
+
+- 这个 Agent 访问了什么数据
+- 它为什么调用了某个工具
+- 它执行了哪些动作
+- 能不能限制权限、回放轨迹、追责和关停
+
+所以“控制面”成为一等公民。这会迫使不同产品在系统设计上向同样的企业架构靠拢。
+
+### 3.4 约束四：模型能力增强后，瓶颈上移到了系统工程
+
+到 2026 年 3 月，前沿模型在推理、代码、长上下文、多模态上的差距仍存在，但战略瓶颈已明显上移。
+
+真正拉开差距的更多是：
+
+- 任务分解是否稳定
+- 状态管理是否可恢复
+- 工具接口是否标准
+- 评测能否闭环
+- 生产事故能否定位
+
+所以项目最终长得像“运行时系统 + 工具协议 + 治理平台”，而不像“一个提示词仓库”。
+
+### 3.5 约束五：成本与延迟把架构压向“分层控制”
+
+长链条 Agent 很贵，也容易慢。行业因此普遍转向：
+
+- 把复杂推理留给少数关键节点
+- 让其余节点用轻模型、规则或传统软件承担
+- 用显式工作流约束搜索空间
+- 把记忆、检索、执行、UI 拆成独立层
+
+这会把系统压缩成相似的分层结构，而不是端到端自由生成。
+
+## 4. 行业正在收敛到哪些元范式？
+
+下面是我认为 2026 年最重要的六个元范式。
+
+### 范式一：`Agent = 模型 + 工具 + 状态 + 守护栏 + 评测`
+
+过去“Agent”常被理解为“会调用函数的大模型”。现在头部平台都在把它重定义成完整系统。
+
+稳定形态通常包含：
+
+- reasoning / planning model
+- tool runtime
+- short-term + long-term memory
+- policy / permission / guardrails
+- tracing / eval / optimization
+
+**判断**：这会成为 2026 年行业默认定义。
+
+### 范式二：`协议先于产品`
+
+MCP、A2A、MCP Apps、AP2 说明一个关键变化：行业开始接受“能力互联优先于单体封闭体验”。
+
+**判断**：2026 年将不再主要是“某家 Agent 平台一统天下”，而是“谁更像协议枢纽，谁就更像基础设施”。
+
+### 范式三：`状态机化，而非纯对话化`
+
+生产级 Agent 正在从 chat loop 变成 stateful workflow。
+
+它们需要：
+
+- 可暂停
+- 可恢复
+- 可回放
+- 可插入人工审批
+- 可分支与重试
+
+**判断**：未来最强的 Agent 框架，本质上会更接近“AI 原生工作流引擎”。
+
+### 范式四：`控制面 / 数据面分离`
+
+Agent 行为会越来越像“数据面”，而治理、身份、预算、审计、策略、部署、评测会独立形成“控制面”。
+
+Microsoft Agent 365、Google Agent Engine + 治理能力、OpenAI AgentKit 的 tracing/evals/registry，都在强化这一分离。
+
+**判断**：2026 年企业级竞争，重点不是谁的模型更会说，而是谁的控制面更完整。
+
+### 范式五：`多 Agent 不是目的，角色化分工才是目的`
+
+行业从“多 Agent 很酷”逐步收敛到“只有在角色边界清晰时，多 Agent 才有意义”。
+
+有效的多 Agent 通常对应：
+
+- 规划者
+- 执行者
+- 审核者
+- 领域专长代理
+- 人类审批者
+
+**判断**：2026 年会淘汰大量“无明确边界的 Agent 群聊式架构”，保留少数分工明确的多角色系统。
+
+### 范式六：`UI 被重新纳入 Agent 回路`
+
+MCP Apps、OpenAI Apps/ChatKit 一类能力说明，行业开始承认一件事：纯文本对话不是终点。
+
+Agent 需要：
+
+- 表单
+- 面板
+- 仪表盘
+- 可交互审批界面
+- 任务过程可视化
+
+**判断**：2026 年的赢家会提供“对话 + 结构化 UI + 工作流界面”的混合体验，而不是纯聊天框。
+
+## 5. 2026 趋势研判
+
+### 5.1 趋势判断一：协议层将成为新基础设施战场
+
+**事实依据**：MCP、A2A、MCP Apps、AP2 在 2025 下半年到 2026 年初连续出现并互相耦合。
+
+**推断**：2026 年平台竞争会更多发生在协议兼容性、工具生态密度、客户端支持范围，而不只是模型榜单。
+
+### 5.2 趋势判断二：托管 Agent Runtime 会快速商品化
+
+**事实依据**：OpenAI、Google、AWS、LangChain 都在强调 runtime、deployment、durability、session、memory、eval。
+
+**推断**：到 2026 年底，“能跑 Agent”会像今天“能跑容器”一样成为基础能力，差异化会转向控制面、行业连接器和数据飞轮。
+
+### 5.3 趋势判断三：评测与观测将从工程加分项变成采购门槛
+
+**事实依据**：Tracing、eval、optimization 已经在 OpenAI AgentKit、Agents SDK、LangSmith、CrewAI AMP、Google Agent Builder 中系统化出现。
+
+**推断**：没有 trace、offline eval、online eval、回放能力的 Agent 产品，很难进入中大型企业核心流程。
+
+### 5.4 趋势判断四：企业会优先采购“有治理的 Agent”，而不是“最聪明的 Agent”
+
+**事实依据**：Microsoft 2026-03-09 的发布把 identity、security、observability 放在同等重要位置；Google 和 AWS 也在重复这一点。
+
+**推断**：2026 年 B2B 市场中，模型上限不是唯一决策因素；权限模型、审计链、数据边界、责任归属会强烈影响成交。
+
+### 5.5 趋势判断五：代码、研究、运营三类工作流会成为最先稳定的三大场景
+
+**事实依据**：
+
+- Anthropic 强推 Claude Code 与长代码库任务
+- OpenAI 持续强化 deep research 与 computer use
+- Microsoft / AWS / Google 的官方案例集中在办公、运营、采购、客服等流程自动化
+
+**推断**：2026 年最先形成稳定 ROI 的不会是“通用全能 Agent”，而是三类垂直工作流：
+
+- 软件研发
+- 信息研究/分析
+- 运营与事务流程
+
+## 6. 对 Board / CEO / CTO 的战略建议
+
+### 6.1 对 Board：别把机会定义成“做一个 Agent”
+
+应该定义成：构建或占据哪一层基础设施。
+
+优先级建议：
+
+1. 协议接入层
+2. 运行时与控制面
+3. 垂直场景工作流
+
+### 6.2 对 CEO：竞争定位要从“模型能力叙事”切到“组织能力叙事”
+
+建议外部叙事从：
+
+- “我们也有 AI Agent”
+
+切换为：
+
+- “我们能让 Agent 在真实组织里被部署、被治理、被审计、被持续优化”
+
+### 6.3 对 CTO：系统设计优先采用五层结构
+
+推荐默认技术蓝图：
+
+1. 模型层：多模型路由，按任务分配成本与能力
+2. 协议层：MCP / A2A / 内部工具契约
+3. 运行时层：状态机、任务队列、checkpoint、resume、HITL
+4. 控制面：身份、权限、预算、审计、评测、追踪
+5. 交互层：聊天、面板、表单、审批流
+
+这个结构的好处是：即使底层模型更换，上层系统仍保持稳定。
+
+## 7. 最终回答：行业正在收敛到什么？
+
+如果必须压缩成一句定义：
+
+> 行业正在从“提示词驱动的软件”收敛到“协议化、状态化、可治理的 Agent 运行时”。
+
+如果必须再进一步压缩成一个元范式：
+
+> **2026 的主流底层范式，不是 Chatbot，不是单模型应用，而是 `带控制面的 AI 原生工作流系统`。**
+
+## 8. 附录：核心来源
+
+以下均为本次判断直接参考的一手来源。
+
+1. OpenAI, “New tools for building agents,” 2025-03-11  
+   https://openai.com/index/new-tools-for-building-agents/
+2. OpenAI Help Center, “Assistants API (v2) FAQ,” 更新于 2026 年初可见版本  
+   https://help.openai.com/en/articles/8550641-assistants-api-v2-faq
+3. OpenAI, “New tools and features in the Responses API,” 2025-05-21  
+   https://openai.com/index/new-tools-and-features-in-the-responses-api/
+4. OpenAI, “Introducing AgentKit,” 2025-10-06  
+   https://openai.com/index/introducing-agentkit/
+5. OpenAI, “Introducing deep research,” 原始发布 2025-02-02，含 2026-02-10 更新  
+   https://openai.com/index/introducing-deep-research/
+6. OpenAI, “Computer-Using Agent,” 2025-01-23  
+   https://openai.com/index/computer-using-agent/
+7. Anthropic, “Claude Opus 4.6,” 2026-02-05  
+   https://www.anthropic.com/news/claude-opus-4-6
+8. Anthropic, “Code with Claude,” 2025-04-03  
+   https://www.anthropic.com/news/Introducing-code-with-claude
+9. Model Context Protocol Blog, “MCP Apps - Bringing UI Capabilities To MCP Clients,” 2026-01-26  
+   https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/
+10. Model Context Protocol Blog, “Update on the Next MCP Protocol Release,” 2025-09-26  
+    https://blog.modelcontextprotocol.io/posts/2025-09-26-mcp-next-version-update/
+11. Google Cloud Blog, “Build and manage multi-system agents with Vertex AI,” 2025-04-09  
+    https://cloud.google.com/blog/en/products/ai-machine-learning/build-and-manage-multi-system-agents-with-vertex-ai
+12. Google Cloud Blog, “Achieve agentic productivity with Vertex AI Agent Builder,” 2025-09-18  
+    https://cloud.google.com/blog/products/ai-machine-learning/get-started-with-vertex-ai-agent-builder
+13. Google Cloud Blog, “Announcing Claude Opus 4.5 on Vertex AI,” 2025-11-24  
+    https://cloud.google.com/blog/products/ai-machine-learning/claude-opus-4-5-on-vertex-ai/
+14. Google Cloud Blog, “What Google Cloud announced in AI this month,” 2025-12  
+    https://cloud.google.com/blog/products/ai-machine-learning/what-google-cloud-announced-in-ai-this-month
+15. Google Cloud Blog, “New Enhanced Tool Governance in Vertex AI Agent Builder,” 2026-01  
+    https://cloud.google.com/blog/products/ai-machine-learning/new-enhanced-tool-governance-in-vertex-ai-agent-builder
+16. Microsoft 365 Blog, “Powering Frontier Transformation with Copilot and agents,” 2026-03-09  
+    https://www.microsoft.com/en-us/microsoft-365/blog/2026/03/09/powering-frontier-transformation-with-copilot-and-agents/
+17. Microsoft Security Blog, “Secure agentic AI for your Frontier Transformation,” 2026-03-09  
+    https://www.microsoft.com/en-us/security/blog/2026/03/09/secure-agentic-ai-for-your-frontier-transformation/
+18. AWS Machine Learning Blog, “Operationalizing Agentic AI Part 1: A Stakeholder’s Guide,” 2026-03-11  
+    https://aws.amazon.com/blogs/machine-learning/operationalizing-agentic-ai-part-1-a-stakeholders-guide/
+19. AWS Industries Blog, “Automate Procurement Workflows with AI Agents using Amazon Bedrock AgentCore,” 2026-02-18  
+    https://aws.amazon.com/blogs/industries/automate-procurement-workflows-with-ai-agents-using-amazon-bedrock-agentcore/
+20. LangChain Blog, “LangChain raises $125M to build the platform for agent engineering,” 2025-10-20  
+    https://blog.langchain.com/series-b/
+21. LangChain Blog, “LangChain & LangGraph 1.0 alpha releases,” 2025-09-02  
+    https://blog.langchain.com/langchain-langchain-1-0-alpha-releases/
+22. LangChain Docs, “Durable execution,” 2026 年当前文档版本  
+    https://docs.langchain.com/oss/javascript/langgraph/durable-execution
+23. CrewAI Docs, “CrewAI Tracing,” 2026 年当前文档版本  
+    https://docs.crewai.com/en/observability
