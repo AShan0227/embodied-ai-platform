@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -10,7 +11,10 @@ import shorten
 
 def test_hash_generation_is_deterministic() -> None:
     url = "https://example.com/very/long/path"
+    expected = hashlib.sha256(url.encode("utf-8")).hexdigest()[:6]
+
     assert shorten.generate_hash(url) == shorten.generate_hash(url)
+    assert shorten.generate_hash(url) == expected
     assert len(shorten.generate_hash(url)) == 6
 
 
@@ -171,6 +175,35 @@ def test_cli_lookup_missing_hash_exits_with_error(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "No URL found for hash: missing" in result.stderr
+
+
+def test_invalid_storage_file_raises_error(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+    storage.write_text('["not", "a", "mapping"]', encoding="utf-8")
+
+    with pytest.raises(shorten.ShortenerError):
+        shorten.load_mappings(storage)
+
+
+def test_cli_requires_exactly_one_action(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "shorten.py",
+            "https://example.com",
+            "--list",
+            "--storage",
+            str(storage),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "provide exactly one of" in result.stderr
 
 
 def test_cli_invalid_storage_exits_with_error(tmp_path: Path) -> None:
