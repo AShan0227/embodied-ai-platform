@@ -78,6 +78,31 @@ def test_invalid_url_handling(invalid_url: str, tmp_path: Path) -> None:
         shorten.shorten_url(invalid_url, storage)
 
 
+def test_invalid_storage_json_raises_storage_error(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+    storage.write_text("{invalid json", encoding="utf-8")
+
+    with pytest.raises(shorten.StorageError):
+        shorten.load_mappings(storage)
+
+
+def test_save_mappings_wraps_os_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = tmp_path / "urls.json"
+
+    def broken_open(self: Path, *args: object, **kwargs: object) -> object:
+        if self == storage:
+            raise OSError("disk full")
+        return original_open(self, *args, **kwargs)
+
+    original_open = Path.open
+    monkeypatch.setattr(Path, "open", broken_open)
+
+    with pytest.raises(shorten.StorageError):
+        shorten.save_mappings({"abc123": "https://example.com"}, storage)
+
+
 def test_cli_lookup_and_list(tmp_path: Path) -> None:
     storage = tmp_path / "urls.json"
     url = "https://example.com/e2e"
@@ -146,3 +171,18 @@ def test_cli_lookup_missing_hash_exits_with_error(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "No URL found for hash: missing" in result.stderr
+
+
+def test_cli_invalid_storage_exits_with_error(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+    storage.write_text("{invalid json", encoding="utf-8")
+
+    result = subprocess.run(
+        [sys.executable, "shorten.py", "--list", "--storage", str(storage)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "Failed to parse storage file" in result.stderr

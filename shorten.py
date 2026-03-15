@@ -27,6 +27,10 @@ class HashCollisionError(ShortenerError):
     """Raised when two different URLs resolve to the same alias."""
 
 
+class StorageError(ShortenerError):
+    """Raised when the storage file cannot be read or written."""
+
+
 def validate_url(url: str) -> None:
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -44,21 +48,26 @@ def load_mappings(storage_path: Path = DEFAULT_STORAGE_PATH) -> Dict[str, str]:
     try:
         with storage_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
+    except OSError as exc:
+        raise StorageError(f"Failed to read storage file: {storage_path}") from exc
     except json.JSONDecodeError as exc:
-        raise ShortenerError(f"Failed to parse storage file: {storage_path}") from exc
+        raise StorageError(f"Failed to parse storage file: {storage_path}") from exc
 
     if not isinstance(data, dict) or not all(
         isinstance(key, str) and isinstance(value, str) for key, value in data.items()
     ):
-        raise ShortenerError(f"Storage file has invalid format: {storage_path}")
+        raise StorageError(f"Storage file has invalid format: {storage_path}")
 
     return data
 
 
 def save_mappings(mappings: Dict[str, str], storage_path: Path = DEFAULT_STORAGE_PATH) -> None:
-    with storage_path.open("w", encoding="utf-8") as handle:
-        json.dump(mappings, handle, indent=2, sort_keys=True)
-        handle.write("\n")
+    try:
+        with storage_path.open("w", encoding="utf-8") as handle:
+            json.dump(mappings, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+    except OSError as exc:
+        raise StorageError(f"Failed to write storage file: {storage_path}") from exc
 
 
 def shorten_url(url: str, storage_path: Path = DEFAULT_STORAGE_PATH) -> str:
