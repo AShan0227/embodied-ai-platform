@@ -181,7 +181,7 @@ def test_invalid_storage_file_raises_error(tmp_path: Path) -> None:
     storage = tmp_path / "urls.json"
     storage.write_text('["not", "a", "mapping"]', encoding="utf-8")
 
-    with pytest.raises(shorten.ShortenerError):
+    with pytest.raises(shorten.StorageError):
         shorten.load_mappings(storage)
 
 
