@@ -30,7 +30,7 @@ PR:
 
 Notes:
 - No automated tests were run because this task is a markdown research deliverable
-- Latest repo commits: `cbd7081` (`PET-8: note source validation limits`) and `661bc62` (`PET-8: record source audit feedback`)
+- The branch and PR already contain the final PET-8 repo state; use the current branch head rather than relying on hard-coded "latest commit" references here
 - The only blocked step in-session was Linear automation because the promised `linear_graphql` tool was unavailable
 
 ## Ready-To-Use Linear Payloads
@@ -69,9 +69,8 @@ PR:
 
 Notes:
 - No automated tests were run because this task is a markdown research deliverable
-- Latest repo commit: 274a959 (PET-8: add tracker handoff payloads)
-- Previous handoff refresh commit: 572e79f (PET-8: refresh handoff status)
-- Previous audit-related commits: cbd7081 (PET-8: note source validation limits), 661bc62 (PET-8: record source audit feedback)
+- The PR already contains the final PET-8 repo state; post this comment against the current branch head instead of copying a hard-coded commit SHA
+- Optional audit references if needed: cbd7081 (source validation limits), 661bc62 (source audit feedback), 32f7a2a (complete handoff flow)
 - The only blocked step in-session was Linear automation because the promised linear_graphql tool was unavailable
 
 Ready for Human Review.
