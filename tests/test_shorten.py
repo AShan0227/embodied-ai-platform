@@ -131,3 +131,30 @@ def test_cli_invalid_url_exits_with_error(tmp_path: Path) -> None:
 
     assert result.returncode == 1
     assert "Invalid URL" in result.stderr
+
+
+def test_cli_list_empty_storage(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+
+    result = subprocess.run(
+        [sys.executable, "shorten.py", "--list", "--storage", str(storage)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert result.stdout.strip() == "No URL mappings stored."
+
+
+def test_cli_lookup_missing_hash_exits_with_error(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+
+    result = subprocess.run(
+        [sys.executable, "shorten.py", "--lookup", "missing", "--storage", str(storage)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 1
+    assert "No URL found for hash: missing" in result.stderr
