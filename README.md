@@ -2,6 +2,11 @@
 
 AI-powered development pipeline: **Paperclip** → **Linear** → **Symphony**
 
+## Current Deliverables
+
+- Strategic research report for `PET-8`: [strategic-research-task.md](strategic-research-task.md)
+- Tracker handoff payloads for `PET-8`: [docs/PET-8-linear-handoff.md](docs/PET-8-linear-handoff.md)
+
 ## Architecture
 
 ```
