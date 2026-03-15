@@ -22,6 +22,7 @@ Completed:
 - Added the main strategy report in `strategic-research-task.md`
 - Added convergence matrix, strategic watchpoints, positioning options, Board checklist, confidence matrix, evidence map, and anti-pattern guidance
 - Added a source-accessibility audit note showing that non-OpenAI references returned `200` during repo-side validation while OpenAI URLs returned `403` to automated checks
+- Added repo-root entry links so reviewers can open the PET-8 deliverables without searching by filename
 - Added and refreshed required evolution metrics and feedback artifacts
 - Pushed all continuation updates to the active branch and PR
 
@@ -61,6 +62,7 @@ Completed:
 - Added the main strategy report in strategic-research-task.md
 - Added convergence matrix, strategic watchpoints, positioning options, Board checklist, confidence matrix, evidence map, and anti-pattern guidance
 - Added a source-accessibility audit note showing that non-OpenAI references returned 200 during repo-side validation while OpenAI URLs returned 403 to automated checks
+- Added repo-root entry links so reviewers can open the PET-8 deliverables without searching by filename
 - Added and refreshed required evolution metrics and feedback artifacts
 - Pushed all continuation updates to the active branch and PR
 
