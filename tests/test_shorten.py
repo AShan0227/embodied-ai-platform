@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -76,6 +77,17 @@ def test_invalid_url_handling(invalid_url: str, tmp_path: Path) -> None:
 
     with pytest.raises(shorten.InvalidURLError):
         shorten.shorten_url(invalid_url, storage)
+
+
+def test_hash_collision_handling(tmp_path: Path) -> None:
+    storage = tmp_path / "urls.json"
+    first_url = "https://example.com/collision-a"
+    second_url = "https://example.com/collision-b"
+
+    with patch("shorten.generate_hash", return_value="abc123"):
+        assert shorten.shorten_url(first_url, storage) == "abc123"
+        with pytest.raises(shorten.HashCollisionError):
+            shorten.shorten_url(second_url, storage)
 
 
 def test_cli_lookup_and_list(tmp_path: Path) -> None:
