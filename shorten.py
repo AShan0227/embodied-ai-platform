@@ -23,6 +23,10 @@ class LookupError(ShortenerError):
     """Raised when a hash alias is not found."""
 
 
+class HashCollisionError(ShortenerError):
+    """Raised when two different URLs resolve to the same alias."""
+
+
 def validate_url(url: str) -> None:
     parsed = urlparse(url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -66,6 +70,10 @@ def shorten_url(url: str, storage_path: Path = DEFAULT_STORAGE_PATH) -> str:
             return alias
 
     alias = generate_hash(url)
+    if alias in mappings and mappings[alias] != url:
+        raise HashCollisionError(
+            f"Hash collision for alias {alias}: existing mapping points to a different URL"
+        )
     mappings[alias] = url
     save_mappings(mappings, storage_path)
     return alias

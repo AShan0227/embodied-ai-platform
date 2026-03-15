@@ -33,6 +33,18 @@ def test_lookup_by_hash(tmp_path: Path) -> None:
     assert shorten.lookup_url(alias, storage) == url
 
 
+def test_hash_collision_for_different_urls_raises_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    storage = tmp_path / "urls.json"
+    monkeypatch.setattr(shorten, "generate_hash", lambda _: "abc123")
+
+    shorten.shorten_url("https://example.com/first", storage)
+
+    with pytest.raises(shorten.HashCollisionError):
+        shorten.shorten_url("https://example.com/second", storage)
+
+
 def test_list_all_mappings(tmp_path: Path) -> None:
     storage = tmp_path / "urls.json"
     first_url = "https://example.com/a"
