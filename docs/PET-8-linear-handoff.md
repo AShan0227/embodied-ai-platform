@@ -35,6 +35,23 @@ Notes:
 
 ## Ready-To-Use Linear Payloads
 
+Issue lookup by identifier:
+
+```text
+query {
+  issues(filter: { identifier: { eq: "PET-8" } }) {
+    nodes {
+      id
+      identifier
+      title
+      state {
+        name
+      }
+    }
+  }
+}
+```
+
 Comment body:
 
 ```text
@@ -52,11 +69,18 @@ PR:
 
 Notes:
 - No automated tests were run because this task is a markdown research deliverable
-- Latest repo commit: 572e79f (PET-8: refresh handoff status)
+- Latest repo commit: 274a959 (PET-8: add tracker handoff payloads)
+- Previous handoff refresh commit: 572e79f (PET-8: refresh handoff status)
 - Previous audit-related commits: cbd7081 (PET-8: note source validation limits), 661bc62 (PET-8: record source audit feedback)
 - The only blocked step in-session was Linear automation because the promised linear_graphql tool was unavailable
 
 Ready for Human Review.
+```
+
+Comment create:
+
+```text
+commentCreate(input: { issueId: "<linear_issue_id>", body: "<paste comment body above>" })
 ```
 
 State transition:
@@ -64,5 +88,11 @@ State transition:
 ```text
 issueUpdate(id: "<linear_issue_id>", input: { stateId: "db1e44f3-cf7f-4535-a129-59be6137ef33" })
 ```
+
+Execution order:
+
+1. Run the issue lookup query and copy the returned `id` for `PET-8`.
+2. Run `commentCreate` with that `id` and the comment body above.
+3. Run `issueUpdate` with the same `id` and state `db1e44f3-cf7f-4535-a129-59be6137ef33`.
 
 Ready for Human Review.
