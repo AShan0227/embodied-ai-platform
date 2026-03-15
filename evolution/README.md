@@ -2,6 +2,8 @@
 
 The company's learning backbone. Four loops, four speeds.
 
+> Format spec adapted from [ECC Continuous Learning v2.1](https://github.com/affaan-m/everything-claude-code) — instinct-based architecture with confidence scoring, domain tagging, and scope awareness.
+
 ## Directory Structure
 
 ```
@@ -30,41 +32,84 @@ evolution/
 | 3. Skill Creation | Bi-weekly | CTO | Review drafts, promote to skills/ |
 | 4. Self-Improvement | Monthly | CTO + Board | Retrospective, SOUL.md proposals |
 
-## Instinct File Format
+## Instinct File Format (ECC v2.1 Compatible)
 
-Borrowed from ECC's continuous learning model. Each instinct file uses this frontmatter:
+Each instinct is **atomic** — one trigger, one action. File format uses YAML frontmatter:
 
 ```yaml
 ---
-confidence: 0.7          # 0.0–1.0, increases with confirmations
-source_count: 3           # independent observations supporting this
+id: prefer-explicit-error-handling    # kebab-case unique identifier
+trigger: "when implementing error handling in new modules"
+confidence: 0.7                       # 0.0–1.0 (see scoring rules below)
+domain: coding                        # coding | architecture | process | communication | security | testing
+scope: global                         # global (all projects) | project (single project)
+source: task-feedback                 # task-feedback | observation | imported | manual
+source_count: 3                       # independent observations supporting this
 created: 2026-03-15
 last_confirmed: 2026-03-15
-category: coding|architecture|process|communication
 ---
-# Instinct: {name}
+# Instinct: Prefer Explicit Error Handling
 
 ## Pattern
-What triggers this instinct — the situation to recognize.
+When implementing error handling in new modules — especially API integrations
+and file I/O operations.
 
 ## Action
-What to do when this pattern is detected.
+Always use explicit error types rather than generic try/catch. Define custom
+error classes for each failure mode. Return structured error objects with
+context (what failed, why, what to try next).
 
 ## Evidence
-Summarized examples from feedback entries.
+- PET-12: Generic try/catch hid a rate-limit error, causing 2h debugging
+- PET-18: Explicit error types caught a config issue immediately
+- PET-23: Custom errors enabled automatic retry logic
 
 ## Anti-pattern
-What NOT to do (learned from failures).
+DO NOT use bare `except Exception` or `catch (e)` without re-typing.
+DO NOT swallow errors silently.
 ```
 
-## Confidence Rules
+### Properties (from ECC)
+- **Atomic**: one trigger, one action — no compound instincts
+- **Confidence-weighted**: 0.3 = tentative, 0.5 = moderate, 0.7 = strong, 0.9 = near-certain
+- **Domain-tagged**: enables filtered loading (e.g., only load `coding` instincts for coding tasks)
+- **Evidence-backed**: tracks what observations created it
+- **Scope-aware**: `global` applies everywhere; `project` is isolated
 
-- New instinct starts at 0.5
-- Each independent confirmation: +0.1 (cap at 1.0)
-- Each contradiction (INSTINCT_CHALLENGE): −0.1
-- No confirmation in 30 days: −0.05/week (decay)
-- Below 0.3: archive to `instincts/archived/`
-- Above 0.9: promote to company knowledge (copy to `docs/proven-patterns/`)
+## Confidence Scoring (ECC-aligned)
+
+| Score | Meaning | Behavior |
+|-------|---------|----------|
+| 0.3 | Tentative | Suggested but not enforced |
+| 0.5 | Moderate | Applied when clearly relevant |
+| 0.7 | Strong | Auto-applied in matching contexts |
+| 0.9 | Near-certain | Core behavior, candidate for promotion |
+
+### Confidence Changes
+- New instinct starts at **0.5**
+- Each independent confirmation: **+0.1** (cap at 1.0)
+- Each contradiction (INSTINCT_CHALLENGE): **−0.1**
+- No confirmation in 30 days: **−0.05/week** (decay)
+- Below 0.3: **archive** to `instincts/archived/`
+- Above 0.9: **promote** to company knowledge (copy to `docs/proven-patterns/`)
+
+### Promotion Criteria (from ECC v2.1)
+An instinct can be promoted to global company knowledge when:
+- Confidence ≥ 0.9
+- source_count ≥ 5
+- Confirmed across ≥ 2 different task types or agents
+
+## Scope Decision Guide (from ECC)
+
+| Pattern Type | Scope | Examples |
+|-------------|-------|---------|
+| Framework conventions | **project** | "Use React hooks", "Follow Django patterns" |
+| File structure | **project** | "Tests in `__tests__/`" |
+| Code style | **project** | "Use functional style", "Prefer dataclasses" |
+| Security practices | **global** | "Validate user input", "Sanitize SQL" |
+| General best practices | **global** | "Write tests first", "Always handle errors" |
+| Tool/workflow preferences | **global** | "Grep before Edit", "Read before Write" |
+| Git practices | **global** | "Conventional commits", "Small focused PRs" |
 
 ## Feedback File Format
 
@@ -99,3 +144,13 @@ time_efficiency: 0-10
 collaboration: 0-10
 notes: "free-form observations"
 ```
+
+## L0/L1/L2 Loading Protocol
+
+To minimize token cost, agents use tiered loading:
+
+- **L0** (always): Read `_index.md` — one-line per instinct, ~100 tokens total
+- **L1** (on match): Read instinct frontmatter only — `id`, `trigger`, `confidence`, `domain`
+- **L2** (on strong match): Read full instinct file — Pattern, Action, Evidence, Anti-pattern
+
+**Rule**: Never load all instincts at L2. Start at L0, drill down only on matches.
