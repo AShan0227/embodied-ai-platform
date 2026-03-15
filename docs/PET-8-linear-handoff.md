@@ -24,6 +24,7 @@ Completed:
 - Added a source-accessibility audit note showing that non-OpenAI references returned `200` during repo-side validation while OpenAI URLs returned `403` to automated checks
 - Added repo-root entry links so reviewers can open the PET-8 deliverables without searching by filename
 - Added and refreshed required evolution metrics and feedback artifacts
+- Refreshed PR/body and repo-local coordination metadata so reviewer-facing status matches the current branch head
 - Pushed all continuation updates to the active branch and PR
 
 PR:
@@ -64,6 +65,7 @@ Completed:
 - Added a source-accessibility audit note showing that non-OpenAI references returned 200 during repo-side validation while OpenAI URLs returned 403 to automated checks
 - Added repo-root entry links so reviewers can open the PET-8 deliverables without searching by filename
 - Added and refreshed required evolution metrics and feedback artifacts
+- Refreshed PR/body and repo-local coordination metadata so reviewer-facing status matches the current branch head
 - Pushed all continuation updates to the active branch and PR
 
 PR:
@@ -72,7 +74,7 @@ PR:
 Notes:
 - No automated tests were run because this task is a markdown research deliverable
 - The PR already contains the final PET-8 repo state; post this comment against the current branch head instead of copying a hard-coded commit SHA
-- Optional audit references if needed: cbd7081 (source validation limits), 661bc62 (source audit feedback), 32f7a2a (complete handoff flow)
+- Optional audit references if needed: cbd7081 (source validation limits), 661bc62 (source audit feedback), 32f7a2a (complete handoff flow), daa01b8 (continuation audit)
 - The only blocked step in-session was Linear automation because the promised linear_graphql tool was unavailable
 
 Ready for Human Review.
