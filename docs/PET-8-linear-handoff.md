@@ -2,6 +2,14 @@
 
 Use this when `linear_graphql` is available again.
 
+## Current Repo Status
+
+- Tracker currently shows `Rework`, but PR `#2` has no review comments or change requests
+- Repo audit on the current branch head found no remaining PET-8 content gap or stale repo-local metadata
+- Next useful step is either:
+  - apply explicit reviewer/tracker feedback if new rework items appear, or
+  - post the prepared Linear comment and move the issue to `Human Review` once tracker access is available
+
 ## Target State
 
 - Move issue `PET-8` to `Human Review`
@@ -34,6 +42,7 @@ Notes:
 - No automated tests were run because this task is a markdown research deliverable
 - The branch and PR already contain the final PET-8 repo state; use the current branch head rather than relying on hard-coded "latest commit" references here
 - The only blocked step in-session was Linear automation because the promised `linear_graphql` tool was unavailable
+- If the issue remains in `Rework`, first check whether new tracker-side comments exist; no repo-visible rework request was present during the latest audit
 
 ## Ready-To-Use Linear Payloads
 
