@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   lint:
     name: Lint & Validate
@@ -93,6 +98,99 @@ jobs:
             echo "✅ $f"
           done
           echo "=== Feedback check complete ==="
+
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pytest
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Discover test files
+        id: discover-tests
+        run: |
+          mapfile -t test_files < <(find . -type f -name 'test_*.py' | sort)
+          if [ "${#test_files[@]}" -eq 0 ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "summary=No test_*.py files found." >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          printf '%s\n' "${test_files[@]}" > .pytest-files.txt
+          {
+            echo "found=true"
+            echo "summary<<EOF"
+            printf 'Ran pytest against:\n'
+            printf '%s\n' "${test_files[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run pytest
+        id: pytest
+        if: steps.discover-tests.outputs.found == 'true'
+        continue-on-error: true
+        run: |
+          mapfile -t test_files < .pytest-files.txt
+          pytest "${test_files[@]}"
+
+      - name: Comment pytest result on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          TESTS_FOUND: ${{ steps.discover-tests.outputs.found }}
+          TEST_SUMMARY: ${{ steps.discover-tests.outputs.summary }}
+          PYTEST_OUTCOME: ${{ steps.pytest.outcome }}
+        with:
+          script: |
+            const marker = '<!-- python-test-report -->';
+            const body = process.env.TESTS_FOUND === 'true'
+              ? `${marker}
+            ## Python Test Report
+            Status: ${process.env.PYTEST_OUTCOME === 'success' ? 'PASS' : 'FAIL'}
+
+            ${process.env.TEST_SUMMARY}`
+              : `${marker}
+            ## Python Test Report
+            Status: SKIPPED
+
+            No \`test_*.py\` files were found in the repository.`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Fail if pytest failed
+        if: steps.discover-tests.outputs.found == 'true' && steps.pytest.outcome != 'success'
+        run: exit 1
 
   pr-size:
     name: PR Size Check
