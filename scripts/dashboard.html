@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<!-- Open locally with: python3 -m http.server 8080 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创世 Genesis — System Dashboard</title>
+  <style>
+    :root {
+      --bg: #071014;
+      --panel: rgba(11, 22, 28, 0.92);
+      --panel-strong: rgba(8, 17, 22, 0.98);
+      --border: rgba(113, 149, 143, 0.18);
+      --text: #d6e6df;
+      --muted: #88a49b;
+      --green: #54f2a0;
+      --yellow: #ffd166;
+      --red: #ff6b6b;
+      --cyan: #6ee7f2;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "SFMono-Regular", "Fira Code", "IBM Plex Mono", "Menlo", monospace;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(84, 242, 160, 0.12), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(110, 231, 242, 0.1), transparent 26%),
+        linear-gradient(180deg, #071014 0%, #03080b 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.1));
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 32px auto;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(11, 22, 28, 0.95), rgba(7, 15, 19, 0.98));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .traffic {
+      display: flex;
+      gap: 10px;
+    }
+
+    .traffic span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .traffic span:nth-child(1) { background: #ff5f56; }
+    .traffic span:nth-child(2) { background: #ffbd2f; }
+    .traffic span:nth-child(3) { background: #27c93f; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle,
+    .timestamp,
+    .meta-label,
+    .status-detail,
+    .pill {
+      color: var(--muted);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.95fr);
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .panel {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(12, 24, 30, 0.9), rgba(8, 16, 20, 0.95));
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 12px;
+    }
+
+    .scanline {
+      color: var(--green);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .stats-grid,
+    .services-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .services-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat-card,
+    .service-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(8, 17, 22, 0.96), rgba(5, 12, 16, 0.98));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after,
+    .service-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -65% auto;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(84, 242, 160, 0.08), transparent 70%);
+    }
+
+    .stat-value {
+      margin-top: 10px;
+      font-size: clamp(1.45rem, 4vw, 2.1rem);
+      font-weight: 700;
+      color: #f3fff9;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 16px;
+    }
+
+    .section-head h2,
+    .service-name {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .service-header,
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .status-row {
+      margin: 16px 0 10px;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 18px rgba(255, 209, 102, 0.55);
+      flex: 0 0 auto;
+    }
+
+    .service-card[data-status="up"] .dot {
+      background: var(--green);
+      box-shadow: 0 0 18px rgba(84, 242, 160, 0.55);
+    }
+
+    .service-card[data-status="down"] .dot {
+      background: var(--red);
+      box-shadow: 0 0 18px rgba(255, 107, 107, 0.48);
+    }
+
+    .service-card[data-status="warn"] .dot {
+      background: var(--yellow);
+      box-shadow: 0 0 18px rgba(255, 209, 102, 0.55);
+    }
+
+    .service-url {
+      word-break: break-all;
+      color: var(--cyan);
+      font-size: 0.88rem;
+    }
+
+    .footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .services-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar,
+      .footer,
+      .section-head,
+      .service-header,
+      .status-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 20px, 100%);
+        margin: 10px auto;
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .panel,
+      .stat-card,
+      .service-card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body data-active-instincts="4" data-feedback-files="2" data-last-curation="2026-03-18">
+  <main class="shell">
+    <header class="topbar">
+      <div class="traffic" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="timestamp" id="lastUpdated">Last refresh: --</div>
+    </header>
+
+    <section class="hero">
+      <article class="panel hero-copy">
+        <div class="scanline">Genesis Monitor / Terminal View</div>
+        <h1>创世 Genesis — System Dashboard</h1>
+        <div class="subtitle">
+          Local service health, evolution signals, and refresh telemetry in a single static control surface.
+        </div>
+      </article>
+
+      <aside class="panel">
+        <div class="section-head">
+          <h2>Evolution Stats</h2>
+          <span class="pill">auto-refresh / 30s</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="meta-label">Active Instincts</div>
+            <div class="stat-value" id="activeInstincts">4</div>
+          </div>
+          <div class="stat-card">
+            <div class="meta-label">Feedback Files</div>
+            <div class="stat-value" id="feedbackFiles">2</div>
+          </div>
+          <div class="stat-card">
+            <div class="meta-label">Last Curation</div>
+            <div class="stat-value" id="lastCuration">2026-03-18</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <h2>Service Status</h2>
+        <span class="pill" id="summaryPill">Awaiting first scan</span>
+      </div>
+      <div class="services-grid" id="servicesGrid"></div>
+    </section>
+
+    <footer class="footer">
+      <span>Connectivity checks use browser `fetch()` with a 4.5s timeout.</span>
+      <span id="refreshCountdown">Next refresh in 30s</span>
+    </footer>
+  </main>
+
+  <script>
+    const statsSource = document.body.dataset;
+    const services = [
+      {
+        id: "openclaw",
+        name: "OpenClaw",
+        url: "http://localhost:18789",
+        type: "connectivity",
+        description: "Base endpoint reachability check."
+      },
+      {
+        id: "paperclip",
+        name: "Paperclip",
+        url: "http://localhost:3100/api/health",
+        type: "json",
+        description: "Health API heartbeat."
+      },
+      {
+        id: "openfang",
+        name: "OpenFang",
+        url: "http://localhost:4200/api/status",
+        type: "json",
+        description: "Status API heartbeat."
+      },
+      {
+        id: "symphony",
+        name: "Symphony",
+        url: "http://localhost:4321/api/v1/state",
+        type: "json",
+        description: "Runtime state snapshot."
+      }
+    ];
+
+    const servicesGrid = document.getElementById("servicesGrid");
+    const summaryPill = document.getElementById("summaryPill");
+    const lastUpdated = document.getElementById("lastUpdated");
+    const refreshCountdown = document.getElementById("refreshCountdown");
+    const refreshSeconds = 30;
+    let countdown = refreshSeconds;
+
+    function hydrateStats() {
+      document.getElementById("activeInstincts").textContent = statsSource.activeInstincts || "4";
+      document.getElementById("feedbackFiles").textContent = statsSource.feedbackFiles || "2";
+      document.getElementById("lastCuration").textContent = statsSource.lastCuration || "2026-03-18";
+    }
+
+    function renderServiceCard(service) {
+      const article = document.createElement("article");
+      article.className = "service-card";
+      article.dataset.status = "warn";
+      article.id = `card-${service.id}`;
+      article.innerHTML = `
+        <div class="service-header">
+          <h3 class="service-name">${service.name}</h3>
+          <span class="pill">${service.type === "connectivity" ? "connectivity" : "health endpoint"}</span>
+        </div>
+        <div class="status-row">
+          <div class="status-indicator">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="label-${service.id}">Checking</span>
+          </div>
+          <span class="status-detail" id="http-${service.id}">pending</span>
+        </div>
+        <div class="service-url">${service.url}</div>
+        <p class="status-detail" id="detail-${service.id}">${service.description}</p>
+      `;
+      servicesGrid.appendChild(article);
+    }
+
+    function updateServiceCard(service, state) {
+      const card = document.getElementById(`card-${service.id}`);
+      card.dataset.status = state.status;
+      document.getElementById(`label-${service.id}`).textContent = state.label;
+      document.getElementById(`http-${service.id}`).textContent = state.httpText;
+      document.getElementById(`detail-${service.id}`).textContent = state.detail;
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal, cache: "no-store" });
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    async function probe(service) {
+      try {
+        const response = await fetchWithTimeout(service.url);
+        const contentType = response.headers.get("content-type") || "";
+        let detail = `${response.status} ${response.statusText}`.trim();
+
+        if (service.type === "json" && contentType.includes("application/json")) {
+          const payload = await response.json();
+          detail = JSON.stringify(payload).slice(0, 140);
+        }
+
+        return {
+          status: response.ok ? "up" : "warn",
+          label: response.ok ? "Online" : "Degraded",
+          httpText: response.type === "opaque" ? "opaque" : `${response.status || 0}`,
+          detail
+        };
+      } catch (primaryError) {
+        try {
+          await fetchWithTimeout(service.url, { mode: "no-cors" });
+          return {
+            status: "warn",
+            label: "Reachable",
+            httpText: "opaque",
+            detail: "Connected, but response is hidden by browser CORS policy."
+          };
+        } catch (fallbackError) {
+          const detail = fallbackError.name === "AbortError"
+            ? "Request timed out after 4.5s."
+            : (primaryError.message || "Connection failed.");
+          return {
+            status: "down",
+            label: "Offline",
+            httpText: "error",
+            detail
+          };
+        }
+      }
+    }
+
+    async function refreshStatuses() {
+      const results = await Promise.all(services.map(async (service) => {
+        const state = await probe(service);
+        updateServiceCard(service, state);
+        return state;
+      }));
+
+      const healthy = results.filter((result) => result.status === "up").length;
+      const warnings = results.filter((result) => result.status === "warn").length;
+      const offline = results.filter((result) => result.status === "down").length;
+
+      summaryPill.textContent = `${healthy} online / ${warnings} reachable / ${offline} offline`;
+      lastUpdated.textContent = `Last refresh: ${new Date().toLocaleString()}`;
+      countdown = refreshSeconds;
+    }
+
+    function startCountdown() {
+      refreshCountdown.textContent = `Next refresh in ${countdown}s`;
+      window.setInterval(() => {
+        countdown = countdown > 0 ? countdown - 1 : refreshSeconds;
+        refreshCountdown.textContent = `Next refresh in ${countdown}s`;
+      }, 1000);
+    }
+
+    services.forEach(renderServiceCard);
+    hydrateStats();
+    refreshStatuses();
+    window.setInterval(refreshStatuses, refreshSeconds * 1000);
+    startCountdown();
+  </script>
+</body>
+</html>
