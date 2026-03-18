@@ -154,3 +154,68 @@ To minimize token cost, agents use tiered loading:
 - **L2** (on strong match): Read full instinct file — Pattern, Action, Evidence, Anti-pattern
 
 **Rule**: Never load all instincts at L2. Start at L0, drill down only on matches.
+
+## Loop 3: Skill Self-Creation Protocol
+
+### When to Propose a Skill
+An agent should create a skill proposal when:
+1. A task required >3 steps of similar manual work that could be automated
+2. A pattern appears in 2+ feedback entries as PATTERN_CANDIDATE
+3. An INFRA_SIGNAL suggests a missing integration
+
+### Proposal Format
+Create `evolution/skill-drafts/SKILL-<name>.md`:
+
+```markdown
+---
+proposed_by: <agent_name>
+date: YYYY-MM-DD
+source_tasks: [PET-xx, PET-yy]
+category: tooling|workflow|integration
+status: draft
+---
+
+# Skill: <name>
+
+## Problem
+What manual work or gap this addresses.
+
+## Proposed Solution
+What the skill would do.
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+
+## Estimated Effort
+Low / Medium / High
+```
+
+### Review Process
+1. Agent creates draft in `evolution/skill-drafts/`
+2. CTO reviews during biweekly skill review (or ad-hoc)
+3. If approved → create actual skill via `skill-creator`
+4. If rejected → move to `evolution/skill-drafts/rejected/` with reason
+
+## Loop 4: SOUL.md Self-Modification Protocol
+
+### When to Propose a SOUL Change
+- After 3+ tasks reveal a behavioral pattern worth codifying
+- When a monthly retrospective identifies a persistent communication or process gap
+- When an agent discovers its current directives conflict with observed best practices
+
+### Proposal Process
+1. Agent writes `evolution/soul-proposals/SOUL-<topic>.md` with:
+   - Current behavior description
+   - Proposed change (diff format preferred)
+   - Evidence from task feedback
+   - Risk assessment
+2. CTO reviews and adds technical assessment
+3. Board vote (CEO + CTO consensus required)
+4. If approved → update SOUL.md + commit with rationale
+5. If rejected → archive with explanation
+
+### Guardrails
+- No agent can modify SOUL.md directly without Board approval
+- Safety-critical clauses (Red Lines) require unanimous Board approval
+- All changes tracked in git with linked proposal
