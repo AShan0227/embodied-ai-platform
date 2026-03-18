@@ -135,25 +135,24 @@ jobs:
       - name: Run pytest
         id: pytest
         if: steps.discover-tests.outputs.found == 'true'
-        continue-on-error: true
         run: |
           mapfile -t test_files < .pytest-files.txt
-          pytest "${test_files[@]}"
+          python -m pytest "${test_files[@]}"
 
       - name: Comment pytest result on PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         env:
           TESTS_FOUND: ${{ steps.discover-tests.outputs.found }}
           TEST_SUMMARY: ${{ steps.discover-tests.outputs.summary }}
-          PYTEST_OUTCOME: ${{ steps.pytest.outcome }}
+          PYTEST_STATUS: ${{ steps.pytest.conclusion }}
         with:
           script: |
             const marker = '<!-- python-test-report -->';
             const body = process.env.TESTS_FOUND === 'true'
               ? `${marker}
             ## Python Test Report
-            Status: ${process.env.PYTEST_OUTCOME === 'success' ? 'PASS' : 'FAIL'}
+            Status: ${process.env.PYTEST_STATUS === 'success' ? 'PASS' : 'FAIL'}
 
             ${process.env.TEST_SUMMARY}`
               : `${marker}
@@ -187,10 +186,6 @@ jobs:
                 body,
               });
             }
-
-      - name: Fail if pytest failed
-        if: steps.discover-tests.outputs.found == 'true' && steps.pytest.outcome != 'success'
-        run: exit 1
 
   pr-size:
     name: PR Size Check
