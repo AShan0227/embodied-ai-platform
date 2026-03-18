@@ -138,12 +138,12 @@ jobs:
         continue-on-error: true
         run: |
           mapfile -t test_files < .pytest-files.txt
-          if pytest "${test_files[@]}"; then
-            echo "status=success" >> "$GITHUB_OUTPUT"
-          else
-            echo "status=failure" >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
+          set +e
+          pytest "${test_files[@]}"
+          status=$?
+          echo "$status" > .pytest-exit-code
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Comment pytest result on PR
         if: github.event_name == 'pull_request'
@@ -158,7 +158,7 @@ jobs:
             const body = process.env.TESTS_FOUND === 'true'
               ? `${marker}
             ## Python Test Report
-            Status: ${process.env.PYTEST_STATUS === 'success' ? 'PASS' : 'FAIL'}
+            Status: ${process.env.PYTEST_STATUS === '0' ? 'PASS' : 'FAIL'}
 
             ${process.env.TEST_SUMMARY}`
               : `${marker}
@@ -194,8 +194,8 @@ jobs:
             }
 
       - name: Fail if pytest failed
-        if: steps.discover-tests.outputs.found == 'true' && steps.pytest.outputs.status != 'success'
-        run: exit 1
+        if: steps.discover-tests.outputs.found == 'true'
+        run: test "$(cat .pytest-exit-code)" -eq 0
 
   pr-size:
     name: PR Size Check
