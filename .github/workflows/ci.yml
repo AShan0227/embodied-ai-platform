@@ -137,7 +137,7 @@ jobs:
         if: steps.discover-tests.outputs.found == 'true'
         run: |
           mapfile -t test_files < .pytest-files.txt
-          pytest "${test_files[@]}"
+          python -m pytest "${test_files[@]}"
 
       - name: Comment pytest result on PR
         if: always() && github.event_name == 'pull_request'
