@@ -138,7 +138,12 @@ jobs:
         continue-on-error: true
         run: |
           mapfile -t test_files < .pytest-files.txt
-          pytest "${test_files[@]}"
+          if pytest "${test_files[@]}"; then
+            echo "status=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=failure" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
 
       - name: Comment pytest result on PR
         if: github.event_name == 'pull_request'
@@ -146,14 +151,14 @@ jobs:
         env:
           TESTS_FOUND: ${{ steps.discover-tests.outputs.found }}
           TEST_SUMMARY: ${{ steps.discover-tests.outputs.summary }}
-          PYTEST_OUTCOME: ${{ steps.pytest.outcome }}
+          PYTEST_STATUS: ${{ steps.pytest.outputs.status }}
         with:
           script: |
             const marker = '<!-- python-test-report -->';
             const body = process.env.TESTS_FOUND === 'true'
               ? `${marker}
             ## Python Test Report
-            Status: ${process.env.PYTEST_OUTCOME === 'success' ? 'PASS' : 'FAIL'}
+            Status: ${process.env.PYTEST_STATUS === 'success' ? 'PASS' : 'FAIL'}
 
             ${process.env.TEST_SUMMARY}`
               : `${marker}
@@ -189,7 +194,7 @@ jobs:
             }
 
       - name: Fail if pytest failed
-        if: steps.discover-tests.outputs.found == 'true' && steps.pytest.outcome != 'success'
+        if: steps.discover-tests.outputs.found == 'true' && steps.pytest.outputs.status != 'success'
         run: exit 1
 
   pr-size:
